@@ -1,52 +1,54 @@
-import { View, ScrollView, Text, Alert } from "react-native";
-import HabitDay from "../components/HabitDay";
-import { Header } from "../components/Header";
+import { View, ScrollView, Text, Alert } from "react-native"
+import HabitDay from "../components/HabitDay"
+import { Header } from "../components/Header"
 
-import { DAY_SIZE } from "../components/HabitDay";
-import { generateRangeDatesFromYearStart } from "../utils/generate-range-between-dates";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { api } from "../lib/axios";
-import { Loading } from "../components/Loading";
-import dayjs from "dayjs";
+import { DAY_SIZE } from "../components/HabitDay"
+import { generateRangeDatesFromYearStart } from "../utils/generate-range-between-dates"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { useCallback, useEffect, useState } from "react"
+import { api } from "../lib/axios"
+import { Loading } from "../components/Loading"
+import dayjs from "dayjs"
 
-const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"];
+const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"]
 
-const daysFromYearStart = generateRangeDatesFromYearStart();
+const daysFromYearStart = generateRangeDatesFromYearStart()
 
-const minimumSummaryDateSize = 18 * 5;
-const amountOfDaysToFill = minimumSummaryDateSize - daysFromYearStart.length;
+const minimumSummaryDateSize = 18 * 5
+const amountOfDaysToFill = minimumSummaryDateSize - daysFromYearStart.length
 
 type SummaryType = Array<{
-  date: Date;
-  completed: number;
-  amount: number;
-}>;
+  date: Date
+  completed: number
+  amount: number
+}>
 
 export function Home() {
-  const { navigate } = useNavigation();
+  const { navigate } = useNavigation()
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [summary, setSummary] = useState<SummaryType>([]);
+  const [isLoading, setIsLoading] = useState(true)
+  const [summary, setSummary] = useState<SummaryType>([])
 
   async function fetchData() {
     try {
-      setIsLoading(true);
-      const { data } = await api.get("/summary");
-      setSummary(data);
+      setIsLoading(true)
+      const { data } = await api.get("/summary")
+      setSummary(data)
     } catch (err) {
-      console.log(err);
-      Alert.alert("Ops", "Não foi possível carregar os dados dos hábitos");
+      console.log(err)
+      Alert.alert("Ops", "Não foi possível carregar os dados dos hábitos")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, [])
+  )
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <Loading />
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">
@@ -73,7 +75,9 @@ export function Home() {
         {summary && (
           <View className="flex-row flex-wrap ">
             {daysFromYearStart.map((date) => {
-              const daysWithHabits = summary.find(summaryDay => dayjs(date).isSame(summaryDay.date, 'day'))
+              const daysWithHabits = summary.find((summaryDay) =>
+                dayjs(date).isSame(summaryDay.date, "day")
+              )
 
               return (
                 <HabitDay
@@ -87,7 +91,7 @@ export function Home() {
                     })
                   }
                 />
-              );
+              )
             })}
 
             {amountOfDaysToFill > 0 &&
@@ -102,5 +106,5 @@ export function Home() {
         )}
       </ScrollView>
     </View>
-  );
+  )
 }

@@ -1,67 +1,77 @@
-import { useState } from "react";
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { BackButton } from "../components/BackButton";
 import { Checkbox } from "../components/Checkbox";
 
-import { Feather } from '@expo/vector-icons' 
+import { Feather } from "@expo/vector-icons";
 import colors from "tailwindcss/colors";
 import { api } from "../lib/axios";
+import { Loading } from "../components/Loading";
 
 const availableWeekDays = [
-  'Domingo', 
-  'Segunda-feira',
-  'Terça-feira',
-  'Quarta-feira',
-  'Quinta-feira',
-  'Sexta-feira',
-  'Sábado',
-]
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+];
 
 export function New() {
-  const [title, setTitle] = useState('')
-  const [weekDays, setWeekDays] = useState<number[]>([])
+  const [title, setTitle] = useState("");
+  const [weekDays, setWeekDays] = useState<number[]>([]);
 
   function handleToggleWeekDay(weekDayIndex: number) {
-    if(weekDays.includes(weekDayIndex)) {
-      setWeekDays(prevState => prevState.filter(weekDay => weekDay !== weekDayIndex))
-      return; 
+    if (weekDays.includes(weekDayIndex)) {
+      setWeekDays((prevState) =>
+        prevState.filter((weekDay) => weekDay !== weekDayIndex)
+      );
+      return;
     }
 
-    setWeekDays(prevState => [...prevState, weekDayIndex])
+    setWeekDays((prevState) => [...prevState, weekDayIndex]);
   }
 
   async function handleCreateNewHabit() {
     try {
-      if(!title.trim()) {
-        Alert.alert('Novo Hábito', 'Informe o nome do hábito')
+      if (!title.trim()) {
+        return Alert.alert("Novo Hábito", "Informe o nome do hábito");
       }
 
-      if(!weekDays.length) {
-        Alert.alert('Novo Hábito', 'Selecione a recorrência')
+      if (!weekDays.length) {
+        Alert.alert("Novo Hábito", "Selecione a recorrência");
       }
 
-      await api.post('/habits', {
+      await api.post("/habits", {
         title,
-        weekDays
-      })
+        weekDays,
+      });
 
-      setTitle('')
-      setWeekDays([])
+      setTitle("");
+      setWeekDays([]);
 
-      Alert.alert('Novo hábito', 'Hábito criado com sucesso')
+      Alert.alert("Novo hábito", "Hábito criado com sucesso");
     } catch (error) {
-      console.log(error)
-      Alert.alert('Ops', 'Não foi possível criar o novo hábito')
+      console.log(error);
+      Alert.alert("Ops", "Não foi possível criar o novo hábito");
     }
   }
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <BackButton/>
+        <BackButton />
 
         <Text className="mt-6 text-white font-extrabold text-3xl">
           Criar hábito
@@ -73,7 +83,7 @@ export function New() {
 
         <TextInput
           className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600 "
-          placeholder="Execícios, dormir bem, etc"         
+          placeholder="Execícios, dormir bem, etc"
           placeholderTextColor={colors.zinc[400]}
           value={title}
           onChangeText={setTitle}
@@ -84,8 +94,8 @@ export function New() {
         </Text>
 
         {availableWeekDays.map((weekDay, index) => (
-          <Checkbox 
-            key={weekDay} 
+          <Checkbox
+            key={weekDay}
             title={weekDay}
             checked={weekDays.includes(index)}
             onPress={() => handleToggleWeekDay(index)}
@@ -97,16 +107,12 @@ export function New() {
           flex-row bg-green-600 rounded-md mt-6"
           onPress={handleCreateNewHabit}
         >
-          <Feather
-            name="check"
-            size={20}
-            color={colors.white}
-          />
+          <Feather name="check" size={20} color={colors.white} />
           <Text className="font-semibold text-base text-white ml-2">
-              Confirmar              
+            Confirmar
           </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
-  )
+  );
 }

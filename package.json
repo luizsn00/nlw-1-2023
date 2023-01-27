@@ -1,0 +1,11 @@
+{
+  "name": "nlw-1-2023",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "repository": "git@github.com:luizsn00/nlw-1-2023.git",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
+}
